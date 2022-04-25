@@ -7,6 +7,8 @@ public class GameSettingsInstaller : ScriptableObjectInstaller<GameSettingsInsta
 {
     public PlayerSettings Player;
 
+    
+
     //public SpawnNPCSettings NPCSpawner;
 
     [Serializable]
@@ -14,6 +16,8 @@ public class GameSettingsInstaller : ScriptableObjectInstaller<GameSettingsInsta
     {
         public PlayerController.Settings _PlayerSettings; 
     }
+    
+    
     //[Serializable]
     //public class SpawnNPCSettings
     //{
@@ -22,6 +26,7 @@ public class GameSettingsInstaller : ScriptableObjectInstaller<GameSettingsInsta
     public override void InstallBindings()
     {
         Container.BindInstance(Player._PlayerSettings);
+        
         //Container.BindInstance(NPCSpawner._NPCSettings);
     }
 }

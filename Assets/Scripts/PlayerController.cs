@@ -3,9 +3,16 @@ using System;
 using Zenject;
 using UnityEngine.SceneManagement;
 
+
 public class PlayerController : MonoBehaviour
 {
+    
+
+    public GameColor playerColor;
+
     Settings _settings;
+    
+
 
     [Inject]
     public void Construct(Settings settings)
@@ -30,10 +37,17 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         _settings.playerForwardSpeed = 3f;
+        _settings.playerSideMovementSpeed = 200f;
     }
 
     // Update is called once per frame
     void Update()
+    {
+        Movement();
+        ResetMovement();
+        ReloadScene();
+    }
+    void Movement()
     {
         if (!isDead)
         {
@@ -53,10 +67,16 @@ public class PlayerController : MonoBehaviour
             Position += new Vector3(difference.x, 0, 0) * _settings.playerSideMovementSpeed * Time.smoothDeltaTime;
             startingPosition = endingPosition;
         }
+    }
+    void ResetMovement()
+    {
         if (Input.GetMouseButtonUp(0))
         {
             startingPosition = endingPosition = Vector3.zero;
         }
+    }
+    void ReloadScene()
+    {
         if (Input.GetMouseButtonDown(1))
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -64,21 +84,34 @@ public class PlayerController : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("NPC"))
+        if (other.GetComponent<NPC>() != null)
         {
-            if(transform.GetChild(0).GetChild(0).GetComponent<Renderer>().material.color == 
-                other.transform.GetChild(0).GetComponent<Renderer>().material.color)
-            {
-                Destroy(other.gameObject);
-            }
-            else
-            {
-                _settings.playerForwardSpeed = 0;
-                isDead = true;
-                playerAnimator.SetBool("Run", false);
-                Destroy(other.gameObject);
-            }
+            CollisionDetection(other);
         }
+    }
+    void CollisionDetection(Collider other)
+    {
+        if (playerColor == other.GetComponent<NPC>()._npcColor)
+        {
+            CorrectCollision(other);
+        }
+        else
+        {
+            InCorrectCollision(other);
+        }
+    }
+    void CorrectCollision(Collider other)
+    {
+        Destroy(other.gameObject);
+    }
+    void InCorrectCollision(Collider other)
+    {
+        Debug.Log("Both are not same color");
+        _settings.playerForwardSpeed = 0;
+        _settings.playerSideMovementSpeed = 0;
+        isDead = true;
+        playerAnimator.SetBool("Run", false);
+        Destroy(other.gameObject);
     }
     [Serializable]
     public class Settings
